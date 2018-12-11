@@ -30,9 +30,6 @@ public class CollectionsTest {
 
         testCollections();
         printResults();
-        for(Duration duration: addTestTimes.get("Stack")) {
-            System.out.println("main:" + duration);
-        }
     }
 
     private static void printResults() {
