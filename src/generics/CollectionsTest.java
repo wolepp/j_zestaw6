@@ -6,7 +6,7 @@ import java.util.*;
 
 public class CollectionsTest {
 
-    private static final int numberOfNumbersToAdd = 1000;
+    private static final int numberOfNumbersToAdd = 10000;
     private static final int numberOfNumbersToCheck = 500;
     private static final int numberOfNumbersToRemove = 300;
     private static ArrayList<Collection<Integer>> collections = new ArrayList<>();
@@ -17,33 +17,35 @@ public class CollectionsTest {
 
     public static void main(String[] args) {
 
-        addColectionToTest(new ArrayList<>());
-        addColectionToTest(new Stack<>());
-        addColectionToTest(new Vector<>());
-        addColectionToTest(new PriorityQueue<>());
-        addColectionToTest(new HashSet<>());
-        addColectionToTest(new TreeSet<>());
+        addCollectionToTest(new ArrayList<>());
+        addCollectionToTest(new Stack<>());
+        addCollectionToTest(new Vector<>());
+        addCollectionToTest(new PriorityQueue<>());
+        addCollectionToTest(new HashSet<>());
+        addCollectionToTest(new TreeSet<>());
 
         testCollections();
-
-        System.out.println("Add time:");
-        printResults(addTestTime);
-        System.out.println("Contain time:");
-        printResults(containsTestTime);
-        System.out.println("Remove time:");
-        printResults(removeTestTime);
-
+        printResults();
     }
 
-    private static void printResults(HashMap<String, Duration> results) {
-        for (Map.Entry<String, Duration> wynik: addTestTime.entrySet()) {
-            String key = wynik.getKey();
-            Duration value = wynik.getValue();
+    private static void printResults() {
+        System.out.println("Add time:");
+        printSingleResult(addTestTime);
+        System.out.println(System.lineSeparator()+"Contain time:");
+        printSingleResult(containsTestTime);
+        System.out.println(System.lineSeparator()+"Remove time:");
+        printSingleResult(removeTestTime);
+    }
+
+    private static void printSingleResult(HashMap<String, Duration> results) {
+        for (Map.Entry<String, Duration> result : results.entrySet()) {
+            String key = result.getKey();
+            Duration value = result.getValue();
             System.out.println(key + ": " + value);
         }
     }
 
-    private static void addColectionToTest(Collection<Integer> collection) {
+    private static void addCollectionToTest(Collection<Integer> collection) {
         collections.add(collection);
     }
 
@@ -59,7 +61,6 @@ public class CollectionsTest {
     }
 
     private static void addTest(Collection<Integer> collection) {
-
         Instant beforeTest = Instant.now();
         for (int i = 0; i < numberOfNumbersToAdd; i++)
             collection.add(random.nextInt(numberOfNumbersToAdd));
@@ -70,7 +71,6 @@ public class CollectionsTest {
     }
 
     private static void containsTest(Collection<Integer> collection) {
-
         Instant beforeTest = Instant.now();
         for (int i = 0; i < numberOfNumbersToCheck; i++)
             collection.contains(random.nextInt(numberOfNumbersToAdd));
@@ -81,7 +81,6 @@ public class CollectionsTest {
     }
 
     private static void removeTest(Collection<Integer> collection) {
-
         Instant beforeTest = Instant.now();
         for (int i = 0; i < numberOfNumbersToRemove; i++)
             collection.remove(random.nextInt(numberOfNumbersToAdd));
