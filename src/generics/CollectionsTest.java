@@ -9,8 +9,7 @@ import java.util.*;
 
 public class CollectionsTest {
 
-//    private static final int numberOfNumbersToAdd = 25000000;
-    private static final int numberOfNumbersToAdd = 25000;
+    private static final int numberOfNumbersToAdd = 25000000;
     private static final int numberOfNumbersToCheck = 500;
     private static final int numberOfNumbersToRemove = 500;
     private static ArrayList<Collection<Integer>> collections = new ArrayList<>();
@@ -18,6 +17,7 @@ public class CollectionsTest {
     private static HashMap<String, ArrayList<Duration>> containsTestTimes = new HashMap<>();
     private static HashMap<String, ArrayList<Duration>> removeTestTimes = new HashMap<>();
     private static Random random = new Random();
+    private static final int testRepeats = 20;
 
     public static void main(String[] args) {
 
@@ -30,6 +30,9 @@ public class CollectionsTest {
 
         testCollections();
         printResults();
+        for(Duration duration: addTestTimes.get("Stack")) {
+            System.out.println("main:" + duration);
+        }
     }
 
     private static void printResults() {
@@ -51,10 +54,13 @@ public class CollectionsTest {
         FileWriter fileWriter = new FileWriter(generateFilename(collection, testType));
         PrintWriter printWriter = new PrintWriter(fileWriter);
         for (Duration time: getTimes(collection, testType))
-//            printWriter.println(time.);
-
+            printWriter.println(formatTime(time));
 
         printWriter.close();
+    }
+
+    private static String formatTime(Duration duration) {
+        return duration.getSeconds() + "." + duration.getNano();
     }
 
     private static ArrayList<Duration> getTimes(Collection<Integer> collection, String testType)
@@ -81,8 +87,9 @@ public class CollectionsTest {
     }
 
     private static void testCollections() {
-        for (Collection<Integer> collection : collections)
-            testSingleCollection(collection);
+        for (int i = 0 ; i < testRepeats; i++)
+            for (Collection<Integer> collection : collections)
+                testSingleCollection(collection);
     }
 
     private static void testSingleCollection(Collection<Integer> collection) {
@@ -120,18 +127,18 @@ public class CollectionsTest {
         Instant afterTest = Instant.now();
 
         Duration timeElapsed = Duration.between(beforeTest, afterTest);
+        System.out.println(timeElapsed);
         saveResult(collection, removeTestTimes, timeElapsed);
     }
 
     private static void saveResult(Collection<Integer> collection,
                                    HashMap<String, ArrayList<Duration>> results,
                                    Duration result) {
-        if (!results.containsKey(name(collection))) {
-            ArrayList<Duration> times = new ArrayList<>();
-            results.put(name(collection), times);
-        } else {
-            results.get(name(collection)).add(result);
-        }
+
+        if (!results.containsKey(name(collection)))
+            results.put(name(collection), new ArrayList<>());
+
+        results.get(name(collection)).add(result);
     }
 
     private static String name(Object object) {
