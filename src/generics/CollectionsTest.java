@@ -124,7 +124,6 @@ public class CollectionsTest {
         Instant afterTest = Instant.now();
 
         Duration timeElapsed = Duration.between(beforeTest, afterTest);
-        System.out.println(timeElapsed);
         saveResult(collection, removeTestTimes, timeElapsed);
     }
 
