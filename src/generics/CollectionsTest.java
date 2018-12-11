@@ -1,5 +1,8 @@
 package generics;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -11,10 +14,11 @@ public class CollectionsTest {
     private static final int numberOfNumbersToCheck = 500;
     private static final int numberOfNumbersToRemove = 500;
     private static ArrayList<Collection<Integer>> collections = new ArrayList<>();
-    private static HashMap<String, Duration> addTestTimes = new HashMap<>();
-    private static HashMap<String, Duration> containsTestTimes = new HashMap<>();
-    private static HashMap<String, Duration> removeTestTimes = new HashMap<>();
+    private static HashMap<String, ArrayList<Duration>> addTestTimes = new HashMap<>();
+    private static HashMap<String, ArrayList<Duration>> containsTestTimes = new HashMap<>();
+    private static HashMap<String, ArrayList<Duration>> removeTestTimes = new HashMap<>();
     private static Random random = new Random();
+    private static final String fileName = "data.txt";
 
     public static void main(String[] args) {
 
@@ -30,24 +34,19 @@ public class CollectionsTest {
     }
 
     private static void printResults() {
-        System.out.println("Add time:");
-        printSingleResult(addTestTimes);
-        System.out.println(System.lineSeparator()+"Contain time:");
-        printSingleResult(containsTestTimes);
-        System.out.println(System.lineSeparator()+"Remove time:");
-        printSingleResult(removeTestTimes);
-    }
-
-    private static void printSingleResult(HashMap<String, Duration> results) {
-        for (Map.Entry<String, Duration> result : results.entrySet()) {
-            String collectionName = result.getKey();
-            Duration time = result.getValue();
-            System.out.println(collectionName  + ":  " + formatTime(time));
+        try {
+            writeToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    private static String formatTime(Duration duration) {
-        return duration.getSeconds() + "." + duration.getNano();
+    private static void writeToFile() throws IOException {
+        FileWriter fileWriter = new FileWriter(fileName);
+        PrintWriter printWriter = new PrintWriter(fileWriter);
+        printWriter.println("Some String");
+        printWriter.printf("Product name is %s and its price is %d $", "iPhone", 1000);
+        printWriter.close();
     }
 
     private static void addCollectionToTest(Collection<Integer> collection) {
@@ -98,9 +97,14 @@ public class CollectionsTest {
     }
 
     private static void saveResult(Collection<Integer> collection,
-                                   HashMap<String, Duration> results,
+                                   HashMap<String, ArrayList<Duration>> results,
                                    Duration result) {
-        results.put(name(collection), result);
+        if (!results.containsKey(name(collection))) {
+            ArrayList<Duration> times = new ArrayList<>();
+            results.put(name(collection), times);
+        } else {
+            results.get(name(collection)).add(result);
+        }
     }
 
     private static String name(Object object) {
