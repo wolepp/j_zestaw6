@@ -18,7 +18,6 @@ public class CollectionsTest {
     private static HashMap<String, ArrayList<Duration>> containsTestTimes = new HashMap<>();
     private static HashMap<String, ArrayList<Duration>> removeTestTimes = new HashMap<>();
     private static Random random = new Random();
-    private static final String fileName = "data.txt";
 
     public static void main(String[] args) {
 
@@ -34,19 +33,47 @@ public class CollectionsTest {
     }
 
     private static void printResults() {
-        try {
-            writeToFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Collection<Integer> collection: collections)
+            try {
+                writeTestResultsToFile(collection, "add");
+                writeTestResultsToFile(collection, "contains");
+                writeTestResultsToFile(collection, "remove");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (IllegalTestType e) {
+                System.out.println("Nie istnieje typ testu: " + e.getTestType());
+            }
+    }
+
+    private static void writeTestResultsToFile(Collection<Integer> collection, String testType)
+            throws IllegalTestType, IOException {
+
+        FileWriter fileWriter = new FileWriter(generateFilename(collection, testType));
+        PrintWriter printWriter = new PrintWriter(fileWriter);
+        for (Duration time: getTimes(collection, testType))
+//            printWriter.println(time.);
+
+
+        printWriter.close();
+    }
+
+    private static ArrayList<Duration> getTimes(Collection<Integer> collection, String testType)
+            throws IllegalTestType {
+
+        switch (testType.toLowerCase()) {
+            case "add":
+                return addTestTimes.get(name(collection));
+            case "contains":
+                return containsTestTimes.get(name(collection));
+            case "remove":
+                return removeTestTimes.get(name(collection));
+            default:
+                throw new IllegalTestType(testType);
         }
     }
 
-    private static void writeToFile() throws IOException {
-        FileWriter fileWriter = new FileWriter(fileName);
-        PrintWriter printWriter = new PrintWriter(fileWriter);
-        printWriter.println("Some String");
-        printWriter.printf("Product name is %s and its price is %d $", "iPhone", 1000);
-        printWriter.close();
+    private static String generateFilename(Collection<Integer> collection, String testType) {
+        return testType + name(collection) + "Times.txt";
     }
 
     private static void addCollectionToTest(Collection<Integer> collection) {
