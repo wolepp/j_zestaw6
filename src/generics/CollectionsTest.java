@@ -6,13 +6,14 @@ import java.util.*;
 
 public class CollectionsTest {
 
-    private static final int numberOfNumbersToAdd = 10000;
+//    private static final int numberOfNumbersToAdd = 25000000;
+    private static final int numberOfNumbersToAdd = 25000;
     private static final int numberOfNumbersToCheck = 500;
-    private static final int numberOfNumbersToRemove = 300;
+    private static final int numberOfNumbersToRemove = 500;
     private static ArrayList<Collection<Integer>> collections = new ArrayList<>();
-    private static HashMap<String, Duration> addTestTime = new HashMap<>();
-    private static HashMap<String, Duration> containsTestTime = new HashMap<>();
-    private static HashMap<String, Duration> removeTestTime = new HashMap<>();
+    private static HashMap<String, Duration> addTestTimes = new HashMap<>();
+    private static HashMap<String, Duration> containsTestTimes = new HashMap<>();
+    private static HashMap<String, Duration> removeTestTimes = new HashMap<>();
     private static Random random = new Random();
 
     public static void main(String[] args) {
@@ -30,19 +31,23 @@ public class CollectionsTest {
 
     private static void printResults() {
         System.out.println("Add time:");
-        printSingleResult(addTestTime);
+        printSingleResult(addTestTimes);
         System.out.println(System.lineSeparator()+"Contain time:");
-        printSingleResult(containsTestTime);
+        printSingleResult(containsTestTimes);
         System.out.println(System.lineSeparator()+"Remove time:");
-        printSingleResult(removeTestTime);
+        printSingleResult(removeTestTimes);
     }
 
     private static void printSingleResult(HashMap<String, Duration> results) {
         for (Map.Entry<String, Duration> result : results.entrySet()) {
-            String key = result.getKey();
-            Duration value = result.getValue();
-            System.out.println(key + ": " + value);
+            String collectionName = result.getKey();
+            Duration time = result.getValue();
+            System.out.println(collectionName  + ":  " + formatTime(time));
         }
+    }
+
+    private static String formatTime(Duration duration) {
+        return duration.getSeconds() + "." + duration.getNano();
     }
 
     private static void addCollectionToTest(Collection<Integer> collection) {
@@ -58,16 +63,18 @@ public class CollectionsTest {
         addTest(collection);
         containsTest(collection);
         removeTest(collection);
+        collection.clear();
     }
 
     private static void addTest(Collection<Integer> collection) {
         Instant beforeTest = Instant.now();
-        for (int i = 0; i < numberOfNumbersToAdd; i++)
+        for (int i = 0; i < numberOfNumbersToAdd; i++) {
             collection.add(random.nextInt(numberOfNumbersToAdd));
+        }
         Instant afterTest = Instant.now();
 
         Duration timeElapsed = Duration.between(beforeTest, afterTest);
-        saveResult(collection, addTestTime, timeElapsed);
+        saveResult(collection, addTestTimes, timeElapsed);
     }
 
     private static void containsTest(Collection<Integer> collection) {
@@ -77,7 +84,7 @@ public class CollectionsTest {
         Instant afterTest = Instant.now();
 
         Duration timeElapsed = Duration.between(beforeTest, afterTest);
-        saveResult(collection, containsTestTime, timeElapsed);
+        saveResult(collection, containsTestTimes, timeElapsed);
     }
 
     private static void removeTest(Collection<Integer> collection) {
@@ -87,7 +94,7 @@ public class CollectionsTest {
         Instant afterTest = Instant.now();
 
         Duration timeElapsed = Duration.between(beforeTest, afterTest);
-        saveResult(collection, removeTestTime, timeElapsed);
+        saveResult(collection, removeTestTimes, timeElapsed);
     }
 
     private static void saveResult(Collection<Integer> collection,
