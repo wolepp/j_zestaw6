@@ -9,15 +9,15 @@ import java.util.*;
 
 public class CollectionsTest {
 
-    private static final int numberOfNumbersToAdd = 25000000;
-    private static final int numberOfNumbersToCheck = 500;
-    private static final int numberOfNumbersToRemove = 500;
+    private static final int numberOfNumbersToAdd = 10000000;
+    private static final int numberOfNumbersToCheck = 1500;
+    private static final int numberOfNumbersToRemove = 1500;
     private static ArrayList<Collection<Integer>> collections = new ArrayList<>();
     private static HashMap<String, ArrayList<Duration>> addTestTimes = new HashMap<>();
     private static HashMap<String, ArrayList<Duration>> containsTestTimes = new HashMap<>();
     private static HashMap<String, ArrayList<Duration>> removeTestTimes = new HashMap<>();
     private static Random random = new Random();
-    private static final int testRepeats = 20;
+    private static final int testRepeats = 50;
 
     public static void main(String[] args) {
 
@@ -90,6 +90,7 @@ public class CollectionsTest {
     }
 
     private static void testSingleCollection(Collection<Integer> collection) {
+        System.out.println("Running " + name(collection) + " test");
         addTest(collection);
         containsTest(collection);
         removeTest(collection);
@@ -97,6 +98,7 @@ public class CollectionsTest {
     }
 
     private static void addTest(Collection<Integer> collection) {
+        System.out.println("Add test");
         Instant beforeTest = Instant.now();
         for (int i = 0; i < numberOfNumbersToAdd; i++) {
             collection.add(random.nextInt(numberOfNumbersToAdd));
@@ -108,6 +110,7 @@ public class CollectionsTest {
     }
 
     private static void containsTest(Collection<Integer> collection) {
+        System.out.println("Contain test");
         Instant beforeTest = Instant.now();
         for (int i = 0; i < numberOfNumbersToCheck; i++)
             collection.contains(random.nextInt(numberOfNumbersToAdd));
@@ -118,6 +121,7 @@ public class CollectionsTest {
     }
 
     private static void removeTest(Collection<Integer> collection) {
+        System.out.println("Remove test");
         Instant beforeTest = Instant.now();
         for (int i = 0; i < numberOfNumbersToRemove; i++)
             collection.remove(random.nextInt(numberOfNumbersToAdd));
@@ -131,6 +135,7 @@ public class CollectionsTest {
                                    HashMap<String, ArrayList<Duration>> results,
                                    Duration result) {
 
+        System.out.println("Saving result");
         if (!results.containsKey(name(collection)))
             results.put(name(collection), new ArrayList<>());
 
