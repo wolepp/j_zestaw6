@@ -1,36 +1,86 @@
 package generics;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class BinarySearchTree<E extends Comparable<? super E>> implements Collection<E> {
 
+    protected Node<E> root;
 
-
-
-
+    public BinarySearchTree() {
+        root = null;
+    }
 
     @Override
     public boolean add(E e) {
-        //dynamicznie
-        return false;
+        Node<E> node = new Node<>(e);
+
+        if (root == null)
+            root = node;
+        else {
+            addChild(node, root);
+        }
+
+        //zwraca true, jeśli obiekt się zmienił; BST w wyniku add() zawsze się zmienia
+        return true;
+    }
+
+    private void addChild(Node<E> e, Node<E> parent) {
+        if (e.getValue().compareTo(parent.getValue()) < 0) {
+            if (parent.leftChild() == null) {
+                parent.setLeft(e);
+                e.setParent(parent);
+            }
+            else
+                addChild(e, parent.leftChild());
+        }
+        else {
+            if (parent.rightChild() == null) {
+                parent.setRight(e);
+                e.setParent(parent);
+            }
+            else
+                addChild(e, parent.rightChild());
+        }
     }
 
     @Override
     public Iterator<E> iterator() {
-        //zwraca obiekt klasy BinaryIterator<E extends Comparable<? super e>>
-        // powyższa klasa implementuje interfejs Iterator<E>
-        return null;
+        return new BinaryIterator<E>(this);
     }
+
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        ArrayList<E> array = new ArrayList<>();
+        addElementsToArray(array);
+        return array.toArray();
+
     }
+
+    private void addElementsToArray(List<E> list) {
+
+        //dodaj każdy element do arraya i tam ten, jeśli nie ma dziecków
+        // to go po prostu dodaj
+        // dodaj też lewy i prawy
+        // oczywiście rekurencyjnie xDDDDDDDD
+        //TODO
+
+    }
+
+    /*
+    1. add(current.left)
+    2. addCurrent()
+    3. add(current.right)
+     */
+
+
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     //PONIŻSZE SĄ UNSUPPORTED, ZGODNIE Z POLECENIEM
@@ -48,6 +98,7 @@ public class BinarySearchTree<E extends Comparable<? super E>> implements Collec
     public boolean contains(Object o) {
         throw new UnsupportedOperationException();
     }
+
     @Override
     public boolean remove(Object o) {
         throw new UnsupportedOperationException();

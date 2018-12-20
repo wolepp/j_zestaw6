@@ -13,7 +13,7 @@ public class OrderedPair<K extends Comparable<? super K>, V>
 
     @Override
     public String toString() {
-        return "test";
+        return value.toString();
     }
 
     public K getKey() {
