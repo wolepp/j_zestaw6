@@ -19,36 +19,37 @@ public class BinarySearchTree<E extends Comparable<? super E>> implements Collec
 
         if (root == null)
             root = node;
-        else {
+        else
             addChild(node, root);
-        }
 
-        //zwraca true, jeśli obiekt się zmienił; BST w wyniku add() zawsze się zmienia
+        //metoda ma zwraca true, jeśli obiekt się zmienił; BST w wyniku add() zawsze się zmienia
         return true;
     }
 
     private void addChild(Node<E> e, Node<E> parent) {
+
+        // jeżeli wartość dodawana mniejsza niż parent
         if (e.getValue().compareTo(parent.getValue()) < 0) {
+            // jeśli nie ma lewego dziecka
             if (parent.leftChild() == null) {
                 parent.setLeft(e);
                 e.setParent(parent);
-            }
-            else
+            } else
                 addChild(e, parent.leftChild());
         }
+        // analogicznie, wartość większa niż wartość parent
         else {
             if (parent.rightChild() == null) {
                 parent.setRight(e);
                 e.setParent(parent);
-            }
-            else
+            } else
                 addChild(e, parent.rightChild());
         }
     }
 
     @Override
     public Iterator<E> iterator() {
-        return new BinaryIterator<E>(this);
+        return new BinaryIterator<>(this);
     }
 
 
@@ -57,26 +58,25 @@ public class BinarySearchTree<E extends Comparable<? super E>> implements Collec
         ArrayList<E> array = new ArrayList<>();
         addElementsToArray(array);
         return array.toArray();
-
     }
 
     private void addElementsToArray(List<E> list) {
 
-        //dodaj każdy element do arraya i tam ten, jeśli nie ma dziecków
-        // to go po prostu dodaj
-        // dodaj też lewy i prawy
-        // oczywiście rekurencyjnie xDDDDDDDD
-        //TODO
+        if (root == null)
+            return;
 
+        addToArray(root, list);
     }
 
-    /*
-    1. add(current.left)
-    2. addCurrent()
-    3. add(current.right)
-     */
+    private void addToArray(Node<E> node, List<E> list) {
 
+        if (node.leftChild() != null)
+            addToArray(node.leftChild(), list);
+        list.add(node.getValue());
+        if (node.rightChild() != null)
+            addToArray(node.rightChild(), list);
 
+    }
 
     @Override
     public <T> T[] toArray(T[] a) {
