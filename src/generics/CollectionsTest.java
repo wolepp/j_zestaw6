@@ -1,9 +1,10 @@
 package generics;
 
+import objectexplorer.MemoryMeasurer;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.Duration;
 import java.util.*;
 
 public class CollectionsTest {
@@ -12,8 +13,9 @@ public class CollectionsTest {
     private static HashMap<String, ArrayList<Long>> addTestTimes = new HashMap<>();
     private static HashMap<String, ArrayList<Long>> containsTestTimes = new HashMap<>();
     private static HashMap<String, ArrayList<Long>> removeTestTimes = new HashMap<>();
+    private static HashMap<String, ArrayList<Long>> memoryUse = new HashMap<>();
     private static Random random = new Random();
-    private static final int testRepeats = 20;
+    private static final int testRepeats = 10;
     private static final int numberOfNumbersToAdd = 10_000_000;
     private static final int numberOfNumbersToCheck = 700;
     private static final int numberOfNumbersToRemove = 700;
@@ -29,30 +31,37 @@ public class CollectionsTest {
         addCollectionToTest(new LinkedList<>());
 
         testCollections();
-        printResults();
-        displayResults();
+        saveResults();
     }
 
     private static void displayResults() {
         for (Collection<Integer> collection: collections) {
-            System.out.println("Kolekcja: " + name(collection));
-            displayTimes("Add", addTestTimes.get(name(collection)));
-            displayTimes("Contain", containsTestTimes.get(name(collection)));
-            displayTimes("Remove", removeTestTimes.get(name(collection)));
+            try {
+                System.out.println("Kolekcja: " + name(collection));
+                displayTimes("Add", collection);
+                displayTimes("Contain", collection);
+                displayTimes("Remove", collection);
+                displayTimes("Memory", collection);
+                System.out.println("--------");
+            } catch (IllegalTestType e) {
+                System.out.println("Brak testu tego typu: " + e.getTestType());
+            }
         }
     }
 
-    private static void displayTimes(String testType, ArrayList<Long> times) {
-        for (Long time : times)
+    private static void displayTimes(String testType, Collection<Integer> collection)
+    throws IllegalTestType {
+        for (Long time : getTimes(collection, testType))
             System.out.println(testType + ": " + ((double)time)/1000000000 + "s");
     }
 
-    private static void printResults() {
+    private static void saveResults() {
         for (Collection<Integer> collection: collections)
             try {
-                writeTestResultsToFile(collection, "add");
-                writeTestResultsToFile(collection, "contains");
-                writeTestResultsToFile(collection, "remove");
+                writeTestResultsToFile(collection, "add", true);
+                writeTestResultsToFile(collection, "contains", true);
+                writeTestResultsToFile(collection, "remove", true);
+                writeTestResultsToFile(collection, "memory", false);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (IllegalTestType e) {
@@ -60,19 +69,15 @@ public class CollectionsTest {
             }
     }
 
-    private static void writeTestResultsToFile(Collection<Integer> collection, String testType)
+    private static void writeTestResultsToFile(Collection<Integer> collection, String testType, boolean timeTest)
             throws IllegalTestType, IOException {
 
-        FileWriter fileWriter = new FileWriter(generateFilename(collection, testType));
+        FileWriter fileWriter = new FileWriter(generateFilename(collection, testType, timeTest));
         PrintWriter printWriter = new PrintWriter(fileWriter);
         for (long time: getTimes(collection, testType))
             printWriter.println(time);
 
         printWriter.close();
-    }
-
-    private static String formatTime(Duration duration) {
-        return duration.getSeconds() + "." + duration.getNano();
     }
 
     private static ArrayList<Long> getTimes(Collection<Integer> collection, String testType)
@@ -85,13 +90,17 @@ public class CollectionsTest {
                 return containsTestTimes.get(name(collection));
             case "remove":
                 return removeTestTimes.get(name(collection));
+            case "memory":
+                return memoryUse.get(name(collection));
             default:
                 throw new IllegalTestType(testType);
         }
     }
 
-    private static String generateFilename(Collection<Integer> collection, String testType) {
-        return testType + name(collection) + "Times.txt";
+    private static String generateFilename(Collection<Integer> collection, String testType, boolean time) {
+        if (time)
+            return testType + name(collection) + "Times.txt";
+        return testType + name(collection) + ".txt";
     }
 
     private static void addCollectionToTest(Collection<Integer> collection) {
@@ -126,9 +135,11 @@ public class CollectionsTest {
             collection.add(random.nextInt(numberOfNumbersToAdd));
         }
         long afterTest = System.nanoTime();
-
         long timeElapsed = afterTest - beforeTest;
+        long memoryUsed = MemoryMeasurer.measureBytes(collection);
+
         saveResult(collection, addTestTimes, timeElapsed);
+        saveResult(collection, memoryUse, memoryUsed);
     }
 
     private static void containsTest(Collection<Integer> collection) {
